@@ -1,3 +1,4 @@
+import pickle
 from typing import Generator, List
 
 from gensim.models import Phrases
@@ -18,7 +19,7 @@ def remove_stopwords(documents: List[List[str]]) -> List[List[str]]:
             for doc in documents]
 
 
-def learn_bigrams(documents: List[List[str]]) -> List[List[str]]:
+def bigrams_model(documents: List[List[str]], save: bool = False) -> Phraser:
     # We learn bigrams
     #  https://radimrehurek.com/gensim/models/phrases.html#gensim.models.phrases.Phrases
     bigram = Phrases(documents, min_count=5, threshold=10)
@@ -26,6 +27,14 @@ def learn_bigrams(documents: List[List[str]]) -> List[List[str]]:
     # we reduce the bigram model to its minimal functionality
     bigram_mod = Phraser(bigram)
 
+    if save:
+        with open('../../models/bigrams.pkl', 'wb') as output_file:
+            pickle.dump(bigram_mod, output_file)
+
+    return bigram_mod
+
+
+def extend_bigrams(documents: List[List[str]], bigram_mod: Phraser) -> List[List[str]]:
     # we apply the bigram model to our documents
     return [bigram_mod[doc] for doc in documents]
 
